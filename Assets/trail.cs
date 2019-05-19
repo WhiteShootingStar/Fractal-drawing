@@ -6,10 +6,8 @@ using UnityEngine.SceneManagement;
 
 public class trail : MonoBehaviour
 {
-    float zAxis = 0f;
 
-
-    string start =PlayerPrefs.fractal.start;
+    string start = PlayerPrefs.fractal.start;
     Fractal fractal;
     private float length = 3;
     List<Rule> list;
@@ -23,10 +21,8 @@ public class trail : MonoBehaviour
     {
         transform.position = new Vector2(0, 0);
         camera = Camera.main;
-        
         saves = new Stack<Save>();
         fractal = PlayerPrefs.fractal;
-       
         list = fractal.rules;
         for (int i = 0; i < PlayerPrefs.generations; i++)
         {
@@ -37,12 +33,11 @@ public class trail : MonoBehaviour
     }
     // Start is called before the first frame update
     void Start()
-
     {
-        //  string  temp = fractal.start; ;
-        Debug.Log(start);
-        Debug.Log(start.Length);
-       mult= GetComponent<TrailRenderer>().widthMultiplier += start.Length  / 100000000f;
+
+        AnimationCurve animationCurve = new AnimationCurve();
+        animationCurve.AddKey(0f, 0.05f * PlayerPrefs.generations);
+        GetComponent<TrailRenderer>().widthCurve = animationCurve;
     }
 
     // Update is called once per frame
@@ -51,37 +46,37 @@ public class trail : MonoBehaviour
 
         if (Input.GetAxis("Mouse ScrollWheel") < 0)
         {
-            camera.orthographicSize += 2.5f+mult;
+            camera.orthographicSize += 2.5f * length;
         }
         else if (Input.GetAxis("Mouse ScrollWheel") > 0)
         {
 
-            camera.orthographicSize -= 2.5f+mult;
+            camera.orthographicSize -= 2.5f * length;
         }
 
 
 
 
-            if (counter < start.Length)
+        if (counter < start.Length)
+        {
+            proceedInputValue(start[counter].ToString());
+            counter++;
+            camera.transform.position = new Vector3(transform.position.x, transform.position.y, -2);
+        }
+
+
+        if (counter == start.Length)
+        {
+
+            if (Input.GetMouseButton(1))
             {
-                proceedInputValue(start[counter].ToString());
-                counter++;
-                camera.transform.position = new Vector3(transform.position.x, transform.position.y, -2);
+                camera.transform.Translate(new Vector2(-Input.GetAxis("Mouse X"), -Input.GetAxis("Mouse Y")) * length * length);
             }
+        }
 
 
-            if (counter == start.Length)
-            {
-
-                if (Input.GetMouseButton(1))
-                {
-                    camera.transform.Translate(new Vector2(-Input.GetAxis("Mouse X"), -Input.GetAxis("Mouse Y")) * length);
-                }
-            }
 
 
-        
-        
     }
 
 
@@ -89,19 +84,19 @@ public class trail : MonoBehaviour
     {
         for (int i = 0; i < command.Length; i++)
         {
-           
-            if (command[i] == 'F'|| command[i] == 'A'|| command[i] == 'B'|| command[i] == 'G')
+
+            if (command[i] == 'F' || command[i] == 'A' || command[i] == 'B' || command[i] == 'G')
             {
                 GetComponent<TrailRenderer>().emitting = true;
-                var Tronczyk = new Vector2(Mathf.Cos(a), Mathf.Sin(a)) * length * 10;
-                transform.Translate(Tronczyk, Space.World);
-              
+                var Direction = new Vector2(Mathf.Cos(a), Mathf.Sin(a)) * length * 5;
+                transform.Translate(Direction, Space.World);
+
             }
-           else  if (command[i] == 'C')
+            else if (command[i] == 'C')
             {
-                var Tronczyk = new Vector2(Mathf.Cos(a), Mathf.Sin(a)) * length * 10;
+                var Direction = new Vector2(Mathf.Cos(a), Mathf.Sin(a)) * length * 5;
                 GetComponent<TrailRenderer>().emitting = false;
-                transform.Translate(Tronczyk, Space.World);
+                transform.Translate(Direction, Space.World);
             }
             else if (command[i] == '+')
             {
@@ -113,7 +108,7 @@ public class trail : MonoBehaviour
             }
             else if (command[i] == '[')
             {
-               
+
                 saves.Push(new Save { a = a, position = transform.position });
                 if (fractal.name.Equals("Tree"))
                 {
@@ -123,12 +118,14 @@ public class trail : MonoBehaviour
             }
             else if (command[i] == ']')
             {
-              
+
                 Save save = saves.Pop();
                 transform.position = save.position;
                 a = save.a;
-                if (fractal.name.Equals("Tree")) { 
-                a -= 45 * Mathf.Deg2Rad;}
+                if (fractal.name.Equals("Tree"))
+                {
+                    a -= 45 * Mathf.Deg2Rad;
+                }
             }
         }
 
@@ -144,7 +141,7 @@ public class trail : MonoBehaviour
     public void goBack()
     {
         SceneManager.LoadSceneAsync(0);
-   }
+    }
 
 }
 
