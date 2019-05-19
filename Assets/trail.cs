@@ -15,7 +15,7 @@ public class trail : MonoBehaviour
     List<Rule> list;
     Stack<Save> saves;
     int counter = 0;
-   
+    float mult;
 
     Camera camera;
     float a = 0;
@@ -28,21 +28,21 @@ public class trail : MonoBehaviour
         fractal = PlayerPrefs.fractal;
        
         list = fractal.rules;
-       
+        for (int i = 0; i < PlayerPrefs.generations; i++)
+        {
+
+            start = RuleTransformer.TransfromString(start, list);
+
+        }
     }
     // Start is called before the first frame update
     void Start()
 
     {
-      //  string  temp = fractal.start; ;
-        for (int i = 0; i < PlayerPrefs.generations; i++)
-        {
-
-            start = RuleTransformer.TransfromString(start, list);
-            Debug.Log(start + " " + i);
-        }
-
-        Debug.Log(RuleTransformer.TransfromString(start, list));
+        //  string  temp = fractal.start; ;
+        Debug.Log(start);
+        Debug.Log(start.Length);
+       mult= GetComponent<TrailRenderer>().widthMultiplier += start.Length  / 100000000f;
     }
 
     // Update is called once per frame
@@ -51,12 +51,12 @@ public class trail : MonoBehaviour
 
         if (Input.GetAxis("Mouse ScrollWheel") < 0)
         {
-            camera.orthographicSize += 2.5f;
+            camera.orthographicSize += 2.5f+mult;
         }
         else if (Input.GetAxis("Mouse ScrollWheel") > 0)
         {
 
-            camera.orthographicSize -= 2.5f;
+            camera.orthographicSize -= 2.5f+mult;
         }
 
 
